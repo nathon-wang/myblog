@@ -8,7 +8,7 @@ menu:
 subnav:
   github: "https://github.com/nathon-wang"
   #weibo: "#"
-  rss: "#"
+  rss: "atom.xml"
   #zhihu: "#"
   #douban: "#"
   mail: "nathon.wang713@gmail.com"
@@ -17,7 +17,7 @@ subnav:
   #twitter: "#"
   linkedin: "#"
 
-rss: /atom.xml
+rss: atom.xml
 
 # Content
 excerpt_link: more
