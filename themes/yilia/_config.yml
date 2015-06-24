@@ -11,11 +11,11 @@ subnav:
   rss: "atom.xml"
   #zhihu: "#"
   #douban: "#"
-  mail: "nathon.wang713@gmail.com"
+  #mail: "com"
   #facebook: "#"
   #google: "#"
-  #twitter: "#"
-  linkedin: "#"
+  twitter: "https://twitter.com/hklinux_kyle"
+  linkedin: "https://cn.linkedin.com/pub/南-汪/92/15a/551"
 
 rss: atom.xml
 
