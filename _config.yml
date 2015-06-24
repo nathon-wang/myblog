@@ -62,6 +62,7 @@ pagination_dir: page
 
 plugins:
     - hexo-generator-feed
+    - hexo-generator-sitemap
 
 # Extensions
 ## Plugins: http://hexo.io/plugins/
