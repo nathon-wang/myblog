@@ -11,7 +11,7 @@ subnav:
   rss: "#"
   #zhihu: "#"
   #douban: "#"
-  mail: "nathon.wang@gmail.com"
+  mail: "nathon.wang713@gmail.com"
   #facebook: "#"
   #google: "#"
   #twitter: "#"
@@ -60,4 +60,4 @@ tagcloud: true
 #不开启——
 #aboutme: false
 #开启——
-aboutme: 我是谁，我从哪里来，我到哪里去？我就是我，是颜色不一样的吃货…
+aboutme: Python, ArchLinux, Vim, Nodejs, Web, 科幻, 悬疑, 美剧, 游戏...
