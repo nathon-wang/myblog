@@ -111,8 +111,8 @@ def Task(func, *args, **kwargs):
 ~~~
 
 这里忽略了一些与本文无关的部分。可以看到Task里面构造了一个callback，_argument_adapter是将callback的参数进行适配，将不定参数适配成一个参数也就是result， 最后通过
-future。set_result(result)将result赋值给future，这样future就被解析出来。 那么问题来了，AsyncHTTPClient并没有经过Task的适配，而是直接返回一个Future。这个Future是在
-什么时候解析的呢。让我们深入httpclient。py，来看下AsyncHTTPClient是如何解析Future的，这是simplehttpclient。py中的fetch函数
+future.set_result(result)将result赋值给future，这样future就被解析出来。 那么问题来了，AsyncHTTPClient并没有经过Task的适配，而是直接返回一个Future。这个Future是在
+什么时候解析的呢？进httpclient.py来看下AsyncHTTPClient是如何解析Future的，这是httpclient.py中的fetch函数，也就是我们实际发起http请求的那个函数
 
 ~~~python
 def fetch(self, request, callback=None, raise_error=True, **kwargs):
@@ -144,15 +144,17 @@ def fetch(self, request, callback=None, raise_error=True, **kwargs):
     return future
 ~~~
 
-fetch中定义一个代表fetch执行结果的future，如果调用时传入了callback，并不是直接将callback传给fetch_impl，而是再封装一下成handle_future，而实际的callback则换成handle_response，
-fetch_impl最后会在当收到response的时候调用handle_response回调(这个有兴趣可以看下，如果以后有写httpserver相关的分析可能会再分析),
-handle_response会解析出代表执行结果的future。对没有设置callback的调用，future解析结束整个流程也就结束了。而对于设置了callback的调用，future完成之后会调用handle_future，
-而handle_future通过io_loop调用原始的我们传入的callback。 至此可以看到AsyncHTTPClient是如何把一个callback型的异步调用转换成一个返回future的异步调用，而这个future会在handle_response
-调用时被解析得到返回的response。
+fetch中定义一个代表fetch异步调用执行结果的future，如果调用时传入了callback，并不是直接将callback传给fetch_impl，而是首先给future设置一个名为handle_future解析完成后的回调，这个handle_future
+中通过add_callback把实际传进来的callback加入到IOLoop中让IOLoop规划其调用。而传入到fetch_impl中的callback 则换成被了handle_response这个函数，
+fetch_impl最后会在当收到response的时候调用handle_response回调(这个有兴趣可以看下，如果以后有写httpserver相关的分析可能会再分析), handle_response会解析出代表执行结果的future。对没有设置callback的调用，future解析结束整个流程也就结束了。而对于设置了callback的调用，future完成之后会调用handle_future 。
+画个简图来描述一下调用过程
+fetch->fetch_impl->HTTP请求直到有response或出错，如果有response回调handle_response->future.set_result(response)(future有值了)->如果fetch带了callback则handle_future->ioloop中调用callback
+至此可以看到AsyncHTTPClient是如何把一个callback型的异步调用转换成一个返回future的异步调用，而这个future会在handle_response调用时被解析得到返回的response。
 
-好了，现在让我们来深入gen.coroutine这个装饰器以及其最终实现Runner类。对于返回future的异步调用，
-yield会将这个future抛出，而coroutine装饰器会拿到这个future并进行相关的操作coroutine装饰器会调用_make_coroutine_wrapper方法， 我们只
-看其中判断func(也就是被装饰的那个函数)返回generator的部分
+好了，差不多该深入gen.coroutine这个装饰器以及其最终实现Runner类。其实看完上面的内容gen.coroutine和Runner的作用也呼之欲出，其主要功能就是拿到yield出的异步调用返回的future，看这个
+future是否已经完成，如果完成就把结果再send到generator中，如果没有完成就要为future设置一个完成时回调，这个回调的主要作用就是启动Runner(也就是调用run方法)。至于future啥时候完成，这个
+gen.coroutine和Runner可不管，你必须设计一个AsyncHTTPClient中fetch那样的返回Future的异步调用或者用Task封装一下你的带有callback的异步调用。下面是节选gen.coroutine装饰器中主要方法
+_make_coroutine_wrapper的代码的主要部分
 
 ~~~python
 
