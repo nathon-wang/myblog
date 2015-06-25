@@ -38,13 +38,15 @@ class GenAsyncHandler(RequestHandler):
 ~~~
 
 初识这段代码觉得好神奇，其实gen.coroutine只不过是将一个基于callback的典型的异步调用适配成基于yield的伪同步，说是伪同步是因为代码流程上类
-似同步，但是实际确实异步的。这样做有几个好处:
+似同步，但是实际却是异步的。这样做有几个好处:
 1。控制流跟同步类似，我们知道callback里去做控制流还是比较恶心的，就算nodejs里的async这样的模块，但是分支多起来也非常不好写。(爽)
 2。可以共享变量，没有了callback，所有的本地变量在同一个作用域中。 (爽爽)
 3。可以并行执行，yield可以抛出list或dict，并行执行其中的异步流程。(爽爽爽。。。此处省略一万个爽)
 
 神奇的gen.coroutine装饰器是怎么做到这一切的？让我首先买个关子，不是进入到gen里面分析coroutine和Runner这两核心的方法(类)，而是首先分析一些这
-些方法(类)中用到的一些技术， 然后再回到coroutine装饰器和Runner类中。首先要理解的是generator是如何通过yield与外界进行通信的。
+些方法(类)中用到的一些技术， 然后再回到coroutine装饰器和Runner类中。
+
+首先要理解的是generator是如何通过yield与外界进行通信的。
 
 ~~~python
 def test():
@@ -66,8 +68,8 @@ step 2....... 20
 yield out ..... 10
 ~~~
 
-然后让我再说说Future，Future是对异步调用结果的封装。一个callback型的异步调用的执行结果不仅包括调用的返回，还包括返回之后需要的执行回调，所以才需要将
-异步调用的结果封装以下，作为一个结果的占位符。Future基本可以这么写
+然后让我再说说Future，Future是对异步调用结果的封装。一个callback型的异步调用的执行结果不仅包括调用的返回，还包括调用获得返回之后需要执行的回调，所以才需要将
+异步调用的结果封装一下，作为一个异步调用执行结果的占位符。Future类基本可以这么写
 
 ~~~python
 class Future(object):
@@ -92,8 +94,9 @@ class Future(object):
         return self._done is True
 ~~~
 
-当然这只是个简约版的，详细可以考虑concurrent。Future。最后再来说说另一个重要的函数Task， 这是将一个callback型的函数适配成一个返回Future的函数，而这个Future
-会在调用callback时解析
+当然这只是个简约版的，详细可以参看concurrent.Future。
+
+最后再来说说另一个重要的函数Task， 这个函数的主要作用是将一个callback型的异步调用适配成一个返回Future的异步调用，而这个作为异步调用结果的Future会在原来的那个callback被时解析出来
 
 ~~~python
 def Task(func, *args, **kwargs):
