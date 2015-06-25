@@ -1,4 +1,4 @@
-title:  "Tornado源码源码分析系列之一: 化异步为'同步'的gen模块"
+title:  "Python异步框架Tornado源码分析系列之一: 化异步为'同步'的Future和gen.coroutine"
 date: 2015-06-24 10:37:07
 tags:
     - Python
@@ -25,7 +25,7 @@ class AsyncHandler(RequestHandler):
         self.render('template.html')
 ~~~
 
-经过gen。coroutine修饰之后上面的这段代码可以改为
+经过gen.coroutine修饰之后上面的这段代码可以改为
 
 ~~~python
 class GenAsyncHandler(RequestHandler):
@@ -37,13 +37,13 @@ class GenAsyncHandler(RequestHandler):
         self.render('template.html')
 ~~~
 
-初识这段代码觉得好神奇，其实gen。coroutine只不过是将一个基于callback的典型的异步调用适配成基于yield的伪同步，说是伪同步是因为代码流程上类
+初识这段代码觉得好神奇，其实gen.coroutine只不过是将一个基于callback的典型的异步调用适配成基于yield的伪同步，说是伪同步是因为代码流程上类
 似同步，但是实际确实异步的。这样做有几个好处:
 1。控制流跟同步类似，我们知道callback里去做控制流还是比较恶心的，就算nodejs里的async这样的模块，但是分支多起来也非常不好写。(爽)
 2。可以共享变量，没有了callback，所有的本地变量在同一个作用域中。 (爽爽)
 3。可以并行执行，yield可以抛出list或dict，并行执行其中的异步流程。(爽爽爽。。。此处省略一万个爽)
 
-神奇的gen。coroutine装饰器是怎么做到这一切的？让我首先买个关子，不是进入到gen里面分析coroutine和Runner这两核心的方法(类)，而是首先分析一些这
+神奇的gen.coroutine装饰器是怎么做到这一切的？让我首先买个关子，不是进入到gen里面分析coroutine和Runner这两核心的方法(类)，而是首先分析一些这
 些方法(类)中用到的一些技术， 然后再回到coroutine装饰器和Runner类中。首先要理解的是generator是如何通过yield与外界进行通信的。
 
 ~~~python
