@@ -38,6 +38,6 @@ tags:
         wrap(do_async(callback=wrap(do_cb)))
 ~~~
 
-stack_context就是上面的这种解决方案，不过使用的是contextmanager这一python中特性。contextmanger字面意思就是上下文管理器。Python中
-将资源的分配和回收放到上下文管理器中，当with contextmanger_instances as inst 时，相当与调用contextmanger的__enter__ 方法并将__enter__
-方法的返回值赋予as后面的变量并在with语句结束时调用contextmanger的__exit__方法。
+stack_context就是上面的这种解决方案，不过使用的是contextmanager这一python中特性。contextmanger字面意思就是上下文管理器。
+Python中将资源的分配和回收放到上下文管理器中，当with contextmanger_instances as inst 时，相当与调用contextmanger
+的\_\_enter\_\_ 方法并将\_\_enter\_\_方法的返回值赋予as后面的变量并在with语句结束时调用contextmanger的\_\_exit\_\_方法。
