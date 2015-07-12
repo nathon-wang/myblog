@@ -1,4 +1,4 @@
-title:  "Python异步框架Tornado源码分析系列之一: 化异步为'同步'的Future和gen.coroutine"
+title:  "Tornado源码分析系列之一: 化异步为'同步'的Future和gen.coroutine"
 date: 2015-06-24 10:37:07
 tags:
     - Python
