@@ -5,7 +5,7 @@ tags:
     - Tornado
 ---
 
-上一篇文章讨论了一下gen和Future，这次讨论一下Tornado的另一个特色的机制stack_context。首先看下异步调用过程中出现的问题。
+上一篇文章讨论了一下gen和Future，这次讨论一下Tornado的另一个特色的机制stack\_context。首先看下异步调用过程中出现的问题。
 
 ~~~python
     def dosomething():
@@ -38,9 +38,9 @@ tags:
         wrap(do_async(callback=wrap(do_cb)))
 ~~~
 
-stack_context就是使用了上面的这种解决方案，当然作为一个框架代码stack_context.py逼格更高一点，使用contextmanager这一python中特性来实现上述功能。
-contextmanger字面意思就是上下文管理器。 Python中将资源的分配和回收放到上下文管理器中，当with contextmanger_instances as inst 时，相当与
-调用contextmanger的\_\_enter\_\_ 方法并将\_\_enter\_\_方法的返回值赋予as后面的变量inst并在with语句结束时调用contextmanger的\_\_exit\_\_方法。
+stack\_context就是使用了上面的这种解决方案，当然作为一个框架代码stack\_context.py逼格更高一点，使用contextmanager这一python中特性来实现上述功能。
+contextmanger字面意思就是上下文管理器。 Python中将资源的分配和回收放到上下文管理器中，当with contextmanger\_instances as inst 时，相当于
+调用contextmanger的\_\_enter\_\_方法并将\_\_enter\_\_方法的返回值赋予as后面的变量inst并在with语句结束时调用contextmanger的\_\_exit\_\_方法。
 定义了\_\_enter\_\_和\_\_exit\_\_这两个方法的类就是一个contextmanger，也可以说这两个方法就是python里contextmanger的协议。不多说，直接上代码
 
 ~~~python
@@ -101,10 +101,9 @@ class StackContext(object):
 如果耐心点看上面的代码的话，就很容易知道，Tornado把context的管理抽象成一个状态机。每进入或退出一个StackContext状态机就发生一次变迁，
 这也是为什么那个Thread.local的变量名字叫_state，_state[0]是历史路径上的所有的StackContext，_state[1]是当前的那个StackContext。如果你把
 \_state[0]看成一个栈，那么_state[1]就是栈的top指针了。最后这些不同时期的栈组成了一个链表（其实也是个栈），每个时期的栈的_stack[1]
-里面有一个叫old_contexts的指针指向上一个时期的栈。画个图理解一下。
-![stack_context变迁图](/img/stack_context.png)
+里面有一个叫old_contexts的指针指向上一个时期的栈。画个图理解一下。![stack_context变迁图](/img/stack_context.png)
 上面只是完成了我第二段代码里wrap(do_async)的操作，do_cb还没有wrap呢。这个时候stack_context.wrap这个函数就出场了，这也是stack_context里面
-唯一有点难度的代码，当然如果看懂了上面这个图，这段代码其实也很简单。不多说上代码。
+唯一有点难度的代码，当然如果看懂了上面这个图，这段代码其实也很简单。不多说，上代码。
 
 ~~~python
 def wrap(fn):
