@@ -8,14 +8,14 @@ tags:
 上一篇文章讨论了一下gen和Future，这次讨论一下Tornado的另一个特色的机制stack\_context。首先看下异步调用过程中出现的问题。
 
 ~~~python
-    def dosomething():
-        def do_cb():
-            raise ValueException()
+def dosomething():
+    def do_cb():
+        raise ValueException()
 
-        try:
-            do_async(callback=do_cb)
-        except ValueException:
-            deal_with_exception()
+    try:
+        do_async(callback=do_cb)
+    except ValueException:
+        deal_with_exception()
 ~~~
 
 上面的方法里try...except能捕获到do_async抛出的ValueException异常但是不能捕获do_cb中抛出的异常。因为do_cb并没有立即执行，只是被
@@ -23,19 +23,19 @@ tags:
 像下面这样。
 
 ~~~python
-    def wrap(func):
-        def inner(*args, **kwargs)
-            try:
-                return func(*args, **kwargs)
-            except ValueException:
-                deal_with_exception()
-        return inner
+def wrap(func):
+    def inner(*args, **kwargs)
+        try:
+            return func(*args, **kwargs)
+        except ValueException:
+            deal_with_exception()
+    return inner
 
-    def dosomething():
-        def do_cb():
-            raise ValueException()
+def dosomething():
+    def do_cb():
+        raise ValueException()
 
-        wrap(do_async(callback=wrap(do_cb)))
+    wrap(do_async(callback=wrap(do_cb)))
 ~~~
 
 stack\_context就是使用了上面的这种解决方案，当然作为一个框架代码stack\_context.py逼格更高一点，使用contextmanager这一python中特性来实现上述功能。 contextmanger字面意思就是上下文管理器。 Python中将资源的分配和回收放到上下文管理器中，当with contextmanger\_instances as inst 时，相当于
