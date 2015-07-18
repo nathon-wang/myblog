@@ -3,6 +3,7 @@ date: 2015-07-14 11:35:07
 tags:
     - Python
     - Tornado
+    - 原创
 ---
 
 上一篇文章讨论了一下gen和Future，这次讨论一下Tornado的另一个特色的机制stack\_context。首先看下异步调用过程中出现的问题。
