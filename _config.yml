@@ -1,24 +1,6 @@
-menu:
-  #Archives: /archives
-  项目作品: /projects
-  关于我: /aboutme
-rss: /atom.xml
-description: 爱好电影、音乐和书籍，擅长Python
-social:
-  weibo:
-  github: https://github.com/
-  stack_overflow:
-
-page_comment: false
-logo: /images/logo2.jpg
-background:
-  cover: /images/background-cover.jpg
-  color: cover-blue
-
-archive_date_format: MMM DD
-fancybox: true
-
-duoshuo_shortname:
-
-google_analytics: UA-42596364-1
-favicon: /images/favicon.png
+theme: next
+language: zh-Hans
+author: nathon.wang
+description: 编程、技术、生活、人生种种
+title: 汪南的魔法卷
+duoshuo_shortname: nathon-wang
