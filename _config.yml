@@ -3,6 +3,7 @@ language: zh-Hans
 author: nathon.wang
 description: 编程、技术、生活、人生种种
 title: 汪南的魔法卷
+url: http://blog.nathon.wang
 duoshuo_shortname: nathon-wang
 deploy:
   type: git
